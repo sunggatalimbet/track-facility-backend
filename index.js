@@ -1,0 +1,70 @@
+import express from "express";
+import http from "http";
+import cors from "cors";
+import dotenv from "dotenv";
+import { Server } from "socket.io";
+
+import { config } from "./config/env.js";
+import { corsOptions } from "./middleware/cors.js";
+import { errorHandler } from "./middleware/errorHandler.js";
+import { GPIOService } from "./services/gpio.js";
+import { SocketHandler } from "./socket/handler.js";
+
+import healthRoutes from "./routes/health.js";
+import sensorRoutes from "./routes/sensor.js";
+import faceRoutes from "./routes/face.js";
+
+// Load environment variables
+dotenv.config();
+
+const app = express();
+
+// Middleware
+app.use(cors(corsOptions));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.disable("x-powered-by");
+
+// Initialize GPIO
+GPIOService.init();
+
+// Routes
+app.use(healthRoutes);
+app.use(sensorRoutes);
+app.use(faceRoutes);
+
+// Error handler
+app.use(errorHandler);
+
+// Server setup
+const server = http.createServer(app);
+
+// Socket.io setup
+const io = new Server(server, {
+	cors: {
+		origin: [config.CLIENT_URL],
+		methods: ["GET", "POST"],
+		credentials: true,
+	},
+	transports: ["websocket", "polling"],
+	pingTimeout: 60000,
+	pingInterval: 25000,
+	connectTimeout: 5000,
+});
+
+io.on("connection", SocketHandler.handleConnection);
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+	console.log("SIGTERM received. Shutting down gracefully...");
+	server.close(() => {
+		console.log("Server closed");
+		process.exit(0);
+	});
+});
+
+server.listen(config.PORT, () => {
+	console.log(
+		`Server running in ${config.NODE_ENV} mode on port ${config.PORT}`,
+	);
+});
