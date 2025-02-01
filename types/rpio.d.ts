@@ -1,5 +1,5 @@
 declare module "@remarkablearts/rpio" {
-	const rpio: {
+	interface RpioStatic {
 		init: (options: {
 			mapping?: string;
 			gpiomem?: boolean;
@@ -19,7 +19,8 @@ declare module "@remarkablearts/rpio" {
 		i2cEnd: () => void;
 		i2cSetSlaveAddress: (address: number) => void;
 		i2cRead: () => number;
-	};
+	}
 
+	const rpio: RpioStatic;
 	export = rpio;
 }

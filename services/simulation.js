@@ -130,35 +130,25 @@ async function getPulseValue() {
 		await new Promise((resolve) => setTimeout(resolve, 1000));
 
 		// Read FIFO Data (simplified - would need more complex processing for accurate readings)
-		const data = await i2c1.readWord(MAX30102_ADDR, MAX30102_REG_FIFO_DATA);
+		const data = await i2c1.readWord(MAX30102_ADDR, MAX30102_REG_FIFO_DATA); // bpm, sp02
 
 		// Close I2C bus
 		await i2c1.close();
 
 		// Note: This is a simplified calculation and would need more complex processing
 		// for accurate readings in a production environment
-		const bpm = calculateBPM(data); // You would need to implement this
-		const spO2 = calculateSpO2(data); // You would need to implement this
+		// const bpm = calculateBPM(data); // You would need to implement this
+		// const spO2 = calculateSpO2(data); // You would need to implement this
 
 		return {
-			bpm: bpm.toFixed(1),
-			so2: spO2.toFixed(1),
+			bpm: data.bpm,
+			sp02: data.sp02,
 		};
 	} catch (error) {
 		console.error("Error reading pulse value:", error);
 		throw error;
 	}
 }
-
-// // Blink LED once script
-// function toggleAlcoholSensor() {
-// 	rpio.init({ mapping: "gpio" });
-// 	rpio.open(14, rpio.OUTPUT); // Set up pin 14 as output
-// 	rpio.write(14, rpio.HIGH); // Turn LED on
-// 	rpio.sleep(0.5); // Wait 500ms
-// 	rpio.write(14, rpio.LOW); // Turn LED off
-// 	rpio.close(14); // Cleanup
-// }
 
 export {
 	getTemperatureValue,
