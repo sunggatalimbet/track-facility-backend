@@ -1,5 +1,6 @@
 import express from "express";
-import http from "http";
+import https from "https";
+import fs from "fs";
 import cors from "cors";
 import dotenv from "dotenv";
 import { Server } from "socket.io";
@@ -14,18 +15,15 @@ import healthRoutes from "./routes/health.js";
 import sensorRoutes from "./routes/sensor.js";
 import faceRoutes from "./routes/face.js";
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 
-// Middleware
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.disable("x-powered-by");
 
-// Initialize GPIO
 GPIOService.init();
 
 // Routes
@@ -33,13 +31,15 @@ app.use(healthRoutes);
 app.use(sensorRoutes);
 app.use(faceRoutes);
 
-// Error handler
 app.use(errorHandler);
 
-// Server setup
-const server = http.createServer(app);
+const options = {
+	key: fs.readFileSync("certs/key.pem"),
+	cert: fs.readFileSync("certs/cert.pem"),
+};
 
-// Socket.io setup
+const server = https.createServer(options, app);
+
 const io = new Server(server, {
 	cors: {
 		origin: [config.CLIENT_URL],
@@ -54,7 +54,6 @@ const io = new Server(server, {
 
 io.on("connection", SocketHandler.handleConnection);
 
-// Graceful shutdown
 process.on("SIGTERM", () => {
 	console.log("SIGTERM received. Shutting down gracefully...");
 	server.close(() => {
