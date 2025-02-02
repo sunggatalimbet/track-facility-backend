@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { RekognitionService } from "../services/rekognition.js";
 import { S3Service } from "../services/s3.js";
-import { firebaseService } from "../services/firebase.js";
 
 const router = Router();
 
