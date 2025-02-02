@@ -17,7 +17,7 @@ class FirebaseService {
 
 	async addExaminationToWorker(
 		faceId,
-		bpmData,
+		// bpmData,
 		temperatureData,
 		alcoholData,
 	) {
@@ -42,7 +42,7 @@ class FirebaseService {
 			const examination = {
 				alcohol: Number(alcoholData.alcoholLevel),
 				date_time: admin.firestore.FieldValue.serverTimestamp(),
-				pulse: Number(bpmData.bpm),
+				pulse: 0,
 				temperature: Number(temperatureData.temperature),
 			};
 

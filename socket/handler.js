@@ -8,11 +8,17 @@ import {
 } from "../services/simulation.js";
 // import { GPIOService } from "../services/gpio.js";
 // import { GPIO_PINS } from "../services/sensors/constants.js";
+import { exec } from "child_process";
+import { promisify } from "util";
+import fs from "fs/promises";
+
+const execAsync = promisify(exec);
 
 export class SocketHandler {
 	static handleConnection(socket) {
 		console.log(`Client connected: ${socket.id}`);
 		const intervals = [];
+		let cameraInterval;
 
 		try {
 			intervals.push(
@@ -79,6 +85,44 @@ export class SocketHandler {
 					}
 				}, 500),
 			);
+
+			socket.on("start-camera", async () => {
+				try {
+					// Запускаем поток кадров с камеры
+					cameraInterval = setInterval(async () => {
+						try {
+							const tempFile = `/tmp/capture_${Date.now()}.jpg`;
+							await execAsync(
+								`libcamera-still -n -o ${tempFile} --immediate -t 1`,
+							);
+
+							const image = await fs.readFile(tempFile);
+							const base64 = image.toString("base64");
+							await fs.unlink(tempFile);
+
+							socket.emit("camera-frame", {
+								success: true,
+								image: `data:image/jpeg;base64,${base64}`,
+							});
+						} catch (err) {
+							console.error("Error capturing frame:", err);
+							socket.emit(
+								"camera-error",
+								"Failed to capture frame",
+							);
+						}
+					}, 200); // Отправляем кадры каждые 200мс для более плавного видео
+				} catch (err) {
+					console.error("Error starting camera:", err);
+					socket.emit("camera-error", "Failed to start camera");
+				}
+			});
+
+			socket.on("stop-camera", () => {
+				if (cameraInterval) {
+					clearInterval(cameraInterval);
+				}
+			});
 		} catch (error) {
 			console.error("Error in socket communication:", error);
 			socket.emit("error", "Internal server error");
@@ -91,6 +135,9 @@ export class SocketHandler {
 		socket.on("disconnect", () => {
 			console.log(`Client disconnected: ${socket.id}`);
 			intervals.forEach((interval) => clearInterval(interval));
+			if (cameraInterval) {
+				clearInterval(cameraInterval);
+			}
 		});
 	}
 }

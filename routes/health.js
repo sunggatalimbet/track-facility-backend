@@ -5,10 +5,15 @@ const router = Router();
 
 router.post("/health", async (req, res) => {
 	try {
-		const { faceId, bpmData, temperatureData, alcoholData } = req.body;
+		const {
+			faceId,
+			//  bpmData,
+			temperatureData,
+			alcoholData,
+		} = req.body;
 		const data = await firebaseService.addExaminationToWorker(
 			faceId,
-			bpmData,
+			// bpmData,
 			temperatureData,
 			alcoholData,
 		);
