@@ -4,7 +4,7 @@ import {
 	getAlcoholValue,
 	isAlcoholSensorReadyToUse,
 	toggleAlcoholSensor,
-	getPulseValue,
+	// getPulseValue,
 } from "../services/simulation.js";
 // import { GPIOService } from "../services/gpio.js";
 // import { GPIO_PINS } from "../services/sensors/constants.js";
