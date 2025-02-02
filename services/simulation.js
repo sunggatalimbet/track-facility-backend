@@ -116,39 +116,39 @@ function toggleAlcoholSensor() {
 	}
 }
 
-async function getPulseValue() {
-	try {
-		const i2c1 = await i2c.openPromisified(1);
+// async function getPulseValue() {
+// 	try {
+// 		const i2c1 = await i2c.openPromisified(1);
 
-		// Initialize sensor
-		await i2c1.writeByte(MAX30102_ADDR, MAX30102_REG_MODE_CONFIG, 0x03); // SPO2 mode
-		await i2c1.writeByte(MAX30102_ADDR, MAX30102_REG_SPO2_CONFIG, 0x27); // SPO2 high resolution
-		await i2c1.writeByte(MAX30102_ADDR, MAX30102_REG_LED_CONFIG, 0x24); // LED pulse amplitude
-		await i2c1.writeByte(MAX30102_ADDR, MAX30102_REG_FIFO_CONFIG, 0x00); // Sample averaging
+// 		// Initialize sensor
+// 		await i2c1.writeByte(MAX30102_ADDR, MAX30102_REG_MODE_CONFIG, 0x03); // SPO2 mode
+// 		await i2c1.writeByte(MAX30102_ADDR, MAX30102_REG_SPO2_CONFIG, 0x27); // SPO2 high resolution
+// 		await i2c1.writeByte(MAX30102_ADDR, MAX30102_REG_LED_CONFIG, 0x24); // LED pulse amplitude
+// 		await i2c1.writeByte(MAX30102_ADDR, MAX30102_REG_FIFO_CONFIG, 0x00); // Sample averaging
 
-		// Wait for data collection (about 1 second)
-		await new Promise((resolve) => setTimeout(resolve, 1000));
+// 		// Wait for data collection (about 1 second)
+// 		await new Promise((resolve) => setTimeout(resolve, 1000));
 
-		// Read FIFO Data (simplified - would need more complex processing for accurate readings)
-		const data = await i2c1.readWord(MAX30102_ADDR, MAX30102_REG_FIFO_DATA); // bpm, sp02
+// 		// Read FIFO Data (simplified - would need more complex processing for accurate readings)
+// 		const data = await i2c1.readWord(MAX30102_ADDR, MAX30102_REG_FIFO_DATA); // bpm, sp02
 
-		// Close I2C bus
-		await i2c1.close();
+// 		// Close I2C bus
+// 		await i2c1.close();
 
-		// Note: This is a simplified calculation and would need more complex processing
-		// for accurate readings in a production environment
-		// const bpm = calculateBPM(data); // You would need to implement this
-		// const spO2 = calculateSpO2(data); // You would need to implement this
+// 		// Note: This is a simplified calculation and would need more complex processing
+// 		// for accurate readings in a production environment
+// 		// const bpm = calculateBPM(data); // You would need to implement this
+// 		// const spO2 = calculateSpO2(data); // You would need to implement this
 
-		return {
-			bpm: data.bpm,
-			sp02: data.sp02,
-		};
-	} catch (error) {
-		console.error("Error reading pulse value:", error);
-		throw error;
-	}
-}
+// 		return {
+// 			bpm: data.bpm,
+// 			sp02: data.sp02,
+// 		};
+// 	} catch (error) {
+// 		console.error("Error reading pulse value:", error);
+// 		throw error;
+// 	}
+// }
 
 export {
 	getTemperatureValue,
@@ -156,7 +156,7 @@ export {
 	getAlcoholSensorStatus,
 	getAlcoholValue,
 	isAlcoholSensorReadyToUse,
-	getPulseValue,
+	// getPulseValue,
 };
 
 export class SimulationService {

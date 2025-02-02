@@ -5,29 +5,29 @@ import {
 	getAlcoholValue,
 	isAlcoholSensorReadyToUse,
 	toggleAlcoholSensor,
-	getPulseValue,
+	// getPulseValue,
 } from "../services/simulation.js";
 import { GPIOService } from "../services/gpio.js";
 import { GPIO_PINS } from "../services/sensors/constants.js";
 
 const router = Router();
 
-router.get("/api/heartbeat", async (req, res, next) => {
-	try {
-		const data = await getPulseValue();
-		const mappedValue = Math.floor(
-			(parseFloat(data.bpm) - 60) * (255 / 60),
-		);
-		console.log(data);
-		GPIOService.writePin(GPIO_PINS.HEARTBEAT, mappedValue);
-		res.json({
-			timestamp: Date.now(),
-			bpm: data.bpm,
-		});
-	} catch (error) {
-		next(error);
-	}
-});
+// router.get("/api/heartbeat", async (req, res, next) => {
+// 	try {
+// 		const data = await getPulseValue();
+// 		const mappedValue = Math.floor(
+// 			(parseFloat(data.bpm) - 60) * (255 / 60),
+// 		);
+// 		console.log(data);
+// 		GPIOService.writePin(GPIO_PINS.HEARTBEAT, mappedValue);
+// 		res.json({
+// 			timestamp: Date.now(),
+// 			bpm: data.bpm,
+// 		});
+// 	} catch (error) {
+// 		next(error);
+// 	}
+// });
 
 router.get("/api/temperature", async (req, res, next) => {
 	try {
