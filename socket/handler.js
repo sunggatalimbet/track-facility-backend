@@ -24,7 +24,7 @@ export class SocketHandler {
 			intervals.push(
 				setInterval(async () => {
 					try {
-						const data = await getPulseValue();
+						// const data = await getPulseValue();
 						const mappedValue = Math.floor(
 							(parseFloat(data.bpm) - 60) * (255 / 60),
 						);
