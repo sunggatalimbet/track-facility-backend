@@ -88,7 +88,7 @@ export class SocketHandler {
 
 			socket.on("start-camera", async () => {
 				try {
-					// Запускаем поток кадров с камеры
+					// Start streaming frames from the camera
 					cameraInterval = setInterval(async () => {
 						try {
 							const tempFile = `/tmp/capture_${Date.now()}.jpg`;
@@ -111,7 +111,7 @@ export class SocketHandler {
 								"Failed to capture frame",
 							);
 						}
-					}, 200); // Отправляем кадры каждые 200мс для более плавного видео
+					}, 200); // Send frames every 200ms for smoother video
 				} catch (err) {
 					console.error("Error starting camera:", err);
 					socket.emit("camera-error", "Failed to start camera");

@@ -6,10 +6,9 @@ import fs from "fs/promises";
 const execAsync = promisify(exec);
 const router = Router();
 
-// Функция для определения устройства
+// Function to check if the device is a Raspberry Pi
 const isRaspberryPi = () => {
 	try {
-		// Проверяем модель процессора
 		const cpuInfo = fs.readFileSync("/proc/cpuinfo", "utf8");
 		return cpuInfo.includes("Raspberry Pi") || cpuInfo.includes("BCM");
 	} catch {
@@ -17,13 +16,12 @@ const isRaspberryPi = () => {
 	}
 };
 
-// Endpoint для захвата изображения с камеры
+// Endpoint to capture an image from the camera
 router.get("/api/camera/capture", async (req, res) => {
 	try {
 		const tempFile = `/tmp/capture_${Date.now()}.jpg`;
 
 		if (!isRaspberryPi()) {
-			// Для не-Raspberry Pi устройств возвращаем ошибку
 			return res.status(400).json({
 				success: false,
 				error: "Device is not Raspberry Pi. Camera capture is only available on Raspberry Pi.",
@@ -31,14 +29,10 @@ router.get("/api/camera/capture", async (req, res) => {
 			});
 		}
 
-		// Захват изображения с помощью libcamera-still
 		await execAsync(`libcamera-still -n -o ${tempFile} --immediate -t 1`);
 
-		// Чтение файла и конвертация в base64
 		const image = await fs.readFile(tempFile);
 		const base64 = image.toString("base64");
-
-		// Удаление временного файла
 		await fs.unlink(tempFile);
 
 		res.json({
