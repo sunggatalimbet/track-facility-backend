@@ -111,7 +111,7 @@ export class SocketHandler {
 								"Failed to capture frame",
 							);
 						}
-					}, 200); // Send frames every 200ms for smoother video
+					}, 1000); // Send frames every 1000ms for smoother video
 				} catch (err) {
 					console.error("Error starting camera:", err);
 					socket.emit("camera-error", "Failed to start camera");
