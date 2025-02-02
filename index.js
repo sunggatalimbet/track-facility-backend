@@ -1,6 +1,5 @@
 import express from "express";
-import https from "https";
-import fs from "fs";
+import http from "http";
 import cors from "cors";
 import dotenv from "dotenv";
 import { Server } from "socket.io";
@@ -35,12 +34,7 @@ app.use(cameraRoutes);
 
 app.use(errorHandler);
 
-const options = {
-	key: fs.readFileSync("certs/key.pem"),
-	cert: fs.readFileSync("certs/cert.pem"),
-};
-
-const server = https.createServer(options, app);
+const server = http.createServer(app);
 
 const io = new Server(server, {
 	cors: {
