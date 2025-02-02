@@ -74,6 +74,7 @@ async function getAlcoholValue() {
 		rpio.close(PINS.ALCOHOL_SOBER);
 		rpio.close(PINS.ALCOHOL_DRUNK);
 
+		console.log({ soberState, drunkState });
 		if (soberState === rpio.LOW) {
 			return "normal";
 		} else if (drunkState === rpio.LOW) {

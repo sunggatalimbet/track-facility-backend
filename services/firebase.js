@@ -40,7 +40,7 @@ class FirebaseService {
 			// Add examination to the worker's examinations subcollection
 			const examinationsRef = workerRef.collection("examinations");
 			const examination = {
-				alcohol: Number(alcoholData.alcoholLevel),
+				alcohol: alcoholData.alcoholLevel,
 				date_time: admin.firestore.FieldValue.serverTimestamp(),
 				pulse: 0,
 				temperature: Number(temperatureData.temperature),
