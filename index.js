@@ -7,7 +7,7 @@ import { Server } from "socket.io";
 import { config } from "./config/env.js";
 import { corsOptions } from "./middleware/cors.js";
 import { errorHandler } from "./middleware/errorHandler.js";
-import { GPIOService } from "./services/gpio.js";
+// import { GPIOService } from "./services/gpio.js";
 import { SocketHandler } from "./socket/handler.js";
 
 import healthRoutes from "./routes/health.js";
@@ -24,7 +24,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.disable("x-powered-by");
 
-GPIOService.init();
+// GPIOService.init();
 
 // Routes
 app.use(healthRoutes);

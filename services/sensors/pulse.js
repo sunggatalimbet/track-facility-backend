@@ -1,3 +1,5 @@
+import i2c from "i2c-bus";
+
 class HeartRateMonitor {
 	constructor() {
 		this.i2cBus = i2c.openSync(1);
@@ -9,20 +11,20 @@ class HeartRateMonitor {
 		this.redBuffer = new Array(100).fill(0);
 	}
 
-	initSensor() {
+	async initSensor() {
 		try {
 			// Reset the sensor
-			this.i2cBus.writeByteSync(this.address, 0x09, 0x40);
-			execSync("sleep 1");
+			await this.i2cBus.writeByte(this.address, 0x09, 0x40);
+			await new Promise((resolve) => setTimeout(resolve, 1000));
 
 			// Configuration settings
-			this.i2cBus.writeByteSync(this.address, 0x02, 0xc0); // INTR_ENABLE_1
-			this.i2cBus.writeByteSync(this.address, 0x03, 0x00); // INTR_ENABLE_2
-			this.i2cBus.writeByteSync(this.address, 0x08, 0x4f); // FIFO_CONFIG
-			this.i2cBus.writeByteSync(this.address, 0x09, 0x03); // MODE_CONFIG (SpO2 mode)
-			this.i2cBus.writeByteSync(this.address, 0x0a, 0x27); // SPO2_CONFIG
-			this.i2cBus.writeByteSync(this.address, 0x0c, 0x24); // LED1_PA
-			this.i2cBus.writeByteSync(this.address, 0x0d, 0x24); // LED2_PA
+			await this.i2cBus.writeByte(this.address, 0x02, 0xc0);
+			await this.i2cBus.writeByte(this.address, 0x03, 0x00);
+			await this.i2cBus.writeByte(this.address, 0x08, 0x4f);
+			await this.i2cBus.writeByte(this.address, 0x09, 0x03);
+			await this.i2cBus.writeByte(this.address, 0x0a, 0x27);
+			await this.i2cBus.writeByte(this.address, 0x0c, 0x24);
+			await this.i2cBus.writeByte(this.address, 0x0d, 0x24);
 
 			return true;
 		} catch (error) {
@@ -31,9 +33,9 @@ class HeartRateMonitor {
 		}
 	}
 
-	readFifo() {
+	async readFifo() {
 		try {
-			const data = this.i2cBus.readI2cBlockSync(
+			const data = await this.i2cBus.readI2cBlock(
 				this.address,
 				0x07,
 				6,
@@ -60,51 +62,49 @@ class HeartRateMonitor {
 		return { hr, spo2 };
 	}
 
-	start() {
-		if (!this.initSensor()) return;
+	async start() {
+		if (!(await this.initSensor())) return;
 
 		this.running = true;
-		this.readInterval = setInterval(() => {
-			const { red, ir } = this.readFifo();
+		this.readInterval = setInterval(async () => {
+			const { red, ir } = await this.readFifo();
 
-			// Update buffers
 			this.irBuffer.shift();
 			this.irBuffer.push(ir);
 			this.redBuffer.shift();
 			this.redBuffer.push(red);
 
-			// Process data every 4 samples
 			if (Date.now() % 4 === 0) {
 				const result = this.processData();
 				if (result.hr > 0) this.bpm = Math.round(result.hr);
 				if (result.spo2 > 0) this.spo2 = Math.round(result.spo2);
 			}
-		}, 40); // 25Hz sampling
+		}, 40);
 	}
 
-	stop() {
+	async stop() {
 		clearInterval(this.readInterval);
 		this.running = false;
-		this.i2cBus.writeByteSync(this.address, 0x09, 0x80); // Shutdown
-		this.i2cBus.closeSync();
 	}
 
 	// Implement these methods based on hrcalc.py logic
 	calculateHeartRate(irData) {
-		/*...*/
+		// Simulation values for development
+		return Math.floor(Math.random() * (100 - 60) + 60);
 	}
 	calculateSpO2(redData, irData) {
-		/*...*/
+		// Simulation values for development
+		return Math.floor(Math.random() * (100 - 95) + 95);
 	}
 }
 
 // Singleton instance
 let hrmInstance = null;
 
-export function getPulseValue() {
+export async function getPulseValue() {
 	if (!hrmInstance) {
 		hrmInstance = new HeartRateMonitor();
-		hrmInstance.start();
+		await hrmInstance.start();
 	}
 
 	return {

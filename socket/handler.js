@@ -6,7 +6,7 @@ import {
 	isAlcoholSensorReadyToUse,
 } from "../services/sensors/alcohol.js";
 import { getPulseValue } from "../services/sensors/pulse.js";
-// import { simulationService } from "../services/simulation.js";
+import { simulationService } from "../services/simulation.js";
 
 import { exec } from "child_process";
 import { promisify } from "util";

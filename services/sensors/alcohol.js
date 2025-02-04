@@ -8,6 +8,8 @@ const PINS = {
 	ALCOHOL_TOGGLE: 14,
 };
 
+rpio.init({ mapping: "gpio", mock: "raspi-3" });
+
 export function getAlcoholSensorStatus() {
 	try {
 		rpio.open(PINS.ALCOHOL_POWER, rpio.INPUT);
