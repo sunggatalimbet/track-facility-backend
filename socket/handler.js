@@ -1,13 +1,13 @@
+import { getTemperatureValue } from "../services/sensors/temperature.js";
 import {
-	getTemperatureValue,
-	getAlcoholSensorStatus,
 	getAlcoholValue,
-	isAlcoholSensorReadyToUse,
 	toggleAlcoholSensor,
-	// getPulseValue,
-} from "../services/simulation.js";
-// import { GPIOService } from "../services/gpio.js";
-// import { GPIO_PINS } from "../services/sensors/constants.js";
+	getAlcoholSensorStatus,
+	isAlcoholSensorReadyToUse,
+} from "../services/sensors/alcohol.js";
+import { getPulseValue } from "../services/sensors/pulse.js";
+// import { simulationService } from "../services/simulation.js";
+
 import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs/promises";
@@ -24,11 +24,8 @@ export class SocketHandler {
 			intervals.push(
 				setInterval(async () => {
 					try {
-						// const data = await getPulseValue();
-						const mappedValue = Math.floor(
-							(parseFloat(data.bpm) - 60) * (255 / 60),
-						);
-						// GPIOService.writePin(GPIO_PINS.HEARTBEAT, mappedValue);
+						const data = await getPulseValue();
+
 						socket.emit("heartbeat", {
 							timestamp: Date.now(),
 							bpm: data.bpm,
@@ -43,13 +40,7 @@ export class SocketHandler {
 				setInterval(async () => {
 					try {
 						const data = await getTemperatureValue();
-						const mappedValue = Math.floor(
-							(data.objectTemperature - 36) * (255 / 2),
-						);
-						// GPIOService.writePin(
-						// 	GPIO_PINS.TEMPERATURE,
-						// 	mappedValue,
-						// );
+
 						socket.emit("temperature", {
 							timestamp: Date.now(),
 							temperature: data.objectTemperature.toFixed(1),
@@ -71,8 +62,6 @@ export class SocketHandler {
 						}
 
 						const alcoholLevel = await getAlcoholValue();
-						const mappedValue = alcoholLevel === "normal" ? 0 : 255;
-						// GPIOService.writePin(GPIO_PINS.ALCOHOL, mappedValue);
 
 						socket.emit("alcohol", {
 							timestamp: Date.now(),
@@ -88,7 +77,6 @@ export class SocketHandler {
 
 			socket.on("start-camera", async () => {
 				try {
-					// Start streaming frames from the camera
 					cameraInterval = setInterval(async () => {
 						try {
 							const tempFile = `/tmp/capture_${Date.now()}.jpg`;

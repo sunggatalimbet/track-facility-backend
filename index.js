@@ -11,7 +11,7 @@ import { GPIOService } from "./services/gpio.js";
 import { SocketHandler } from "./socket/handler.js";
 
 import healthRoutes from "./routes/health.js";
-import sensorRoutes from "./routes/sensor.js";
+// import sensorRoutes from "./routes/sensor.js";
 import faceRoutes from "./routes/face.js";
 import cameraRoutes from "./routes/camera.js";
 
@@ -28,7 +28,6 @@ GPIOService.init();
 
 // Routes
 app.use(healthRoutes);
-app.use(sensorRoutes);
 app.use(faceRoutes);
 app.use(cameraRoutes);
 
