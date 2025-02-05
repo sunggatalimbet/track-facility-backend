@@ -4,7 +4,6 @@ import {
 	toggleAlcoholSensor,
 	getAlcoholSensorStatus,
 	isAlcoholSensorReadyToUse,
-	getContinuousAlcoholStatus,
 } from "../services/sensors/alcohol.js";
 import { getPulseValue } from "../services/sensors/pulse.js";
 import { simulationService } from "../services/simulation.js";
@@ -65,14 +64,12 @@ export class SocketHandler {
 						}
 
 						const alcoholLevel = await getAlcoholValue();
-						const continuousStatus = getContinuousAlcoholStatus(); // Get continuous status
 
 						socket.emit("alcohol", {
 							timestamp: Date.now(),
 							alcoholLevel: alcoholLevel,
 							sensorStatus: sensorStatus,
 							sensorReady: sensorReady,
-							continuousStatus: continuousStatus, // Include continuous status in the emitted data
 						});
 					} catch (error) {
 						console.error("Alcohol sensor error:", error);

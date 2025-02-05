@@ -1,13 +1,5 @@
 import rpio from "@remarkablearts/rpio";
-
-const PINS = {
-	ALCOHOL_POWER: 23,
-	ALCOHOL_SOBER: 27,
-	ALCOHOL_DRUNK: 22,
-	ALCOHOL_READY: 17,
-	ALCOHOL_TOGGLE: 14,
-};
-
+import { PINS } from "./constants.js";
 rpio.init({ mapping: "gpio", mock: "raspi-3" });
 
 export function getAlcoholSensorStatus() {

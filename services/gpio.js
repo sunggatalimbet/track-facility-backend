@@ -4,14 +4,6 @@ import { getTemperatureValue } from "./sensors/temperature.js";
 import { getAlcoholValue } from "./sensors/alcohol.js";
 import { getPulseValue } from "./sensors/pulse.js";
 
-const PINS = {
-	ALCOHOL_POWER: 23,
-	ALCOHOL_SOBER: 27,
-	ALCOHOL_DRUNK: 22,
-	ALCOHOL_READY: 17,
-	ALCOHOL_TOGGLE: 14,
-};
-
 export class GPIOService {
 	static init() {
 		try {
