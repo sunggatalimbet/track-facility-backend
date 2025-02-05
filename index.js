@@ -7,11 +7,9 @@ import { Server } from "socket.io";
 import { config } from "./config/env.js";
 import { corsOptions } from "./middleware/cors.js";
 import { errorHandler } from "./middleware/errorHandler.js";
-// import { GPIOService } from "./services/gpio.js";
 import { SocketHandler } from "./socket/handler.js";
 
 import healthRoutes from "./routes/health.js";
-// import sensorRoutes from "./routes/sensor.js";
 import faceRoutes from "./routes/face.js";
 import cameraRoutes from "./routes/camera.js";
 
@@ -23,8 +21,6 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.disable("x-powered-by");
-
-// GPIOService.init();
 
 // Routes
 app.use(healthRoutes);

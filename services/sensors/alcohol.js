@@ -67,7 +67,6 @@ export function isAlcoholSensorReadyToUse() {
 	try {
 		rpio.open(PINS.ALCOHOL_READY, rpio.INPUT);
 		const isReady = rpio.read(PINS.ALCOHOL_READY) === rpio.HIGH;
-		rpio.close(PINS.ALCOHOL_READY);
 		return isReady;
 	} catch (error) {
 		console.error("Error checking if alcohol sensor is ready:", error);

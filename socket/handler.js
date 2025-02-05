@@ -39,11 +39,13 @@ export class SocketHandler {
 			intervals.push(
 				setInterval(async () => {
 					try {
-						const data = await getTemperatureValue();
+						// const data = await getTemperatureValue();
+						const simulatedData =
+							simulationService.simulateTemperature();
 
 						socket.emit("temperature", {
 							timestamp: Date.now(),
-							temperature: data.objectTemperature.toFixed(1),
+							temperature: simulatedData.temperature,
 						});
 					} catch (error) {
 						console.error("Temperature error:", error);
