@@ -8,7 +8,7 @@ import { config } from "./config/env.js";
 import { corsOptions } from "./middleware/cors.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { SocketHandler } from "./socket/handler.js";
-import { GPIOService } from "./services/gpio.js";
+// import { GPIOService } from "./services/gpio.js";
 import healthRoutes from "./routes/health.js";
 import faceRoutes from "./routes/face.js";
 import cameraRoutes from "./routes/camera.js";
@@ -17,7 +17,7 @@ dotenv.config();
 
 const app = express();
 
-GPIOService.init();
+// GPIOService.init();
 
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "50mb" }));
