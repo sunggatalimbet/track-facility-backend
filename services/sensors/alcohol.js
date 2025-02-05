@@ -1,5 +1,7 @@
 import { Gpio } from "onoff";
 
+const IS_SIMULATION = process.env.NODE_ENV !== "production";
+
 const PINS = {
 	ALCOHOL_POWER: 23,
 	ALCOHOL_SOBER: 27,
@@ -10,11 +12,25 @@ const PINS = {
 
 const gpios = {};
 
-Object.entries(PINS).forEach(([key, pin]) => {
-	gpios[key] = new Gpio(pin, "in", "both", { activeLow: true });
-});
+if (!IS_SIMULATION) {
+	Object.entries(PINS).forEach(([key, pin]) => {
+		gpios[key] = new Gpio(pin, "in", "both", { activeLow: true });
+	});
+}
+
+// Mock GPIO functions for simulation
+const mockGpio = {
+	readSync: () => (Math.random() > 0.5 ? 1 : 0),
+	writeSync: () => {},
+	setDirection: () => {},
+	unexport: () => {},
+};
 
 export function getAlcoholSensorStatus() {
+	if (IS_SIMULATION) {
+		return Math.random() > 0.5 ? "on" : "off";
+	}
+
 	try {
 		const status = gpios.ALCOHOL_POWER.readSync();
 		return status === 0 ? "off" : "on";
@@ -25,6 +41,11 @@ export function getAlcoholSensorStatus() {
 }
 
 export async function getAlcoholValue() {
+	if (IS_SIMULATION) {
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+		return Math.random() > 0.5 ? "normal" : "abnormal";
+	}
+
 	try {
 		console.debug("Starting alcohol measurement", {
 			pins: [PINS.ALCOHOL_SOBER, PINS.ALCOHOL_DRUNK],
@@ -93,6 +114,10 @@ export async function getAlcoholValue() {
 }
 
 export function isAlcoholSensorReadyToUse() {
+	if (IS_SIMULATION) {
+		return true;
+	}
+
 	try {
 		console.debug("Checking alcohol sensor readiness", {
 			checkPin: PINS.ALCOHOL_READY,
@@ -153,7 +178,9 @@ export function getContinuousAlcoholStatus() {
 	return status;
 }
 
-// Cleanup GPIO on process exit
-process.on("SIGINT", () => {
-	Object.values(gpios).forEach((gpio) => gpio.unexport());
-});
+// Cleanup GPIO only in production
+if (!IS_SIMULATION) {
+	process.on("SIGINT", () => {
+		Object.values(gpios).forEach((gpio) => gpio.unexport());
+	});
+}
