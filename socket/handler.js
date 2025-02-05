@@ -4,6 +4,7 @@ import {
 	toggleAlcoholSensor,
 	getAlcoholSensorStatus,
 	isAlcoholSensorReadyToUse,
+	getContinuousAlcoholStatus,
 } from "../services/sensors/alcohol.js";
 import { getPulseValue } from "../services/sensors/pulse.js";
 import { simulationService } from "../services/simulation.js";
