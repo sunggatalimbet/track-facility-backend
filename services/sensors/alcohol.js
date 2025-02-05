@@ -1,6 +1,30 @@
 import rpio from "@remarkablearts/rpio";
 import { PINS } from "./constants.js";
+
+// Initialize GPIO with BCM numbering and proper setup
 rpio.init({ mapping: "gpio", mock: "raspi-3" });
+
+// Initialize all pins at startup
+function initializePins() {
+	try {
+		// Set up input pins
+		rpio.open(PINS.ALCOHOL_READY, rpio.INPUT, rpio.PULL_UP);
+		rpio.open(PINS.ALCOHOL_SOBER, rpio.INPUT, rpio.PULL_UP);
+		rpio.open(PINS.ALCOHOL_DRUNK, rpio.INPUT, rpio.PULL_UP);
+		rpio.open(PINS.ALCOHOL_POWER, rpio.INPUT, rpio.PULL_UP);
+
+		// Set up output pin
+		rpio.open(PINS.ALCOHOL_TOGGLE, rpio.OUTPUT, rpio.LOW);
+
+		console.log("GPIO pins initialized successfully");
+	} catch (error) {
+		console.error("Failed to initialize GPIO pins:", error);
+		throw error;
+	}
+}
+
+// Initialize pins when module loads
+initializePins();
 
 export function getAlcoholSensorStatus() {
 	try {
@@ -53,8 +77,9 @@ export async function getAlcoholValue() {
 
 export function isAlcoholSensorReadyToUse() {
 	try {
-		const isReady = rpio.read(PINS.ALCOHOL_READY) === rpio.HIGH;
-		return isReady;
+		const alcohol_ready = rpio.read(PINS.ALCOHOL_READY);
+		console.log("Alcohol sensor ready state:", alcohol_ready);
+		return alcohol_ready === rpio.HIGH;
 	} catch (error) {
 		console.error("Error checking if alcohol sensor is ready:", error);
 		return false;
