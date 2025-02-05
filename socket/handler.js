@@ -64,12 +64,14 @@ export class SocketHandler {
 						}
 
 						const alcoholLevel = await getAlcoholValue();
+						const continuousStatus = getContinuousAlcoholStatus(); // Get continuous status
 
 						socket.emit("alcohol", {
 							timestamp: Date.now(),
 							alcoholLevel: alcoholLevel,
 							sensorStatus: sensorStatus,
 							sensorReady: sensorReady,
+							continuousStatus: continuousStatus, // Include continuous status in the emitted data
 						});
 					} catch (error) {
 						console.error("Alcohol sensor error:", error);
