@@ -12,7 +12,6 @@ rpio.init({ mapping: "gpio", mock: "raspi-3" });
 
 export function getAlcoholSensorStatus() {
 	try {
-		rpio.open(PINS.ALCOHOL_POWER, rpio.INPUT);
 		const status = rpio.read(PINS.ALCOHOL_POWER);
 		rpio.close(PINS.ALCOHOL_POWER);
 		return status === rpio.LOW ? "off" : "on";
@@ -28,9 +27,6 @@ export async function getAlcoholValue() {
 			console.log("Sensor not ready");
 			return null;
 		}
-
-		rpio.open(PINS.ALCOHOL_SOBER, rpio.INPUT);
-		rpio.open(PINS.ALCOHOL_DRUNK, rpio.INPUT);
 
 		let soberPrev = rpio.read(PINS.ALCOHOL_SOBER);
 		let drunkPrev = rpio.read(PINS.ALCOHOL_DRUNK);
@@ -65,7 +61,6 @@ export async function getAlcoholValue() {
 
 export function isAlcoholSensorReadyToUse() {
 	try {
-		rpio.open(PINS.ALCOHOL_READY, rpio.INPUT);
 		const isReady = rpio.read(PINS.ALCOHOL_READY) === rpio.HIGH;
 		return isReady;
 	} catch (error) {
@@ -76,7 +71,6 @@ export function isAlcoholSensorReadyToUse() {
 
 export function toggleAlcoholSensor() {
 	try {
-		rpio.open(PINS.ALCOHOL_TOGGLE, rpio.OUTPUT);
 		rpio.write(PINS.ALCOHOL_TOGGLE, rpio.HIGH);
 		rpio.sleep(0.5);
 		rpio.write(PINS.ALCOHOL_TOGGLE, rpio.LOW);
