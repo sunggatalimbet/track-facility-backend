@@ -24,10 +24,15 @@ export function getAlcoholSensorStatus() {
 
 export async function getAlcoholValue() {
 	try {
-		if (!isAlcoholSensorReadyToUse()) {
-			console.log("Sensor not ready");
-			return null;
-		}
+		console.debug("Starting alcohol measurement", {
+			pins: [PINS.ALCOHOL_SOBER, PINS.ALCOHOL_DRUNK],
+			timeout: 5000,
+		});
+
+		// if (!isAlcoholSensorReadyToUse()) {
+		// 	console.log("Sensor not ready");
+		// 	return null;
+		// }
 
 		rpio.open(PINS.ALCOHOL_SOBER, rpio.INPUT);
 		rpio.open(PINS.ALCOHOL_DRUNK, rpio.INPUT);
@@ -35,16 +40,36 @@ export async function getAlcoholValue() {
 		let soberPrev = rpio.read(PINS.ALCOHOL_SOBER);
 		let drunkPrev = rpio.read(PINS.ALCOHOL_DRUNK);
 
-		const timeout = 5000;
+		const timeout = 10000;
 		const start = Date.now();
+
+		console.debug("Initial pin states", {
+			soberPin: PINS.ALCOHOL_SOBER,
+			soberState: soberPrev,
+			drunkPin: PINS.ALCOHOL_DRUNK,
+			drunkState: drunkPrev,
+		});
+
 		while (Date.now() - start < timeout) {
 			const soberCurrent = rpio.read(PINS.ALCOHOL_SOBER);
 			const drunkCurrent = rpio.read(PINS.ALCOHOL_DRUNK);
 
 			if (soberCurrent === rpio.LOW && soberPrev === rpio.HIGH) {
+				console.debug("Sober pin transition detected", {
+					pin: PINS.ALCOHOL_SOBER,
+					previous: soberPrev,
+					current: soberCurrent,
+					decision: "normal",
+				});
 				return "normal";
 			}
 			if (drunkCurrent === rpio.LOW && drunkPrev === rpio.HIGH) {
+				console.debug("Drunk pin transition detected", {
+					pin: PINS.ALCOHOL_DRUNK,
+					previous: drunkPrev,
+					current: drunkCurrent,
+					decision: "abnormal",
+				});
 				return "abnormal";
 			}
 
@@ -53,11 +78,22 @@ export async function getAlcoholValue() {
 			rpio.msleep(10);
 		}
 
+		console.debug("Measurement timeout reached without detection", {
+			duration: Date.now() - start,
+			finalSoberState: soberPrev,
+			finalDrunkState: drunkPrev,
+		});
 		return null;
 	} catch (error) {
-		console.error("Error reading alcohol value:", error);
+		console.error("Alcohol measurement failed", {
+			error: error.message,
+			stack: error.stack,
+		});
 		throw error;
 	} finally {
+		console.debug("Closing alcohol sensor pins", {
+			pins: [PINS.ALCOHOL_SOBER, PINS.ALCOHOL_DRUNK],
+		});
 		rpio.close(PINS.ALCOHOL_SOBER);
 		rpio.close(PINS.ALCOHOL_DRUNK);
 	}
@@ -65,11 +101,28 @@ export async function getAlcoholValue() {
 
 export function isAlcoholSensorReadyToUse() {
 	try {
+		console.debug("Checking alcohol sensor readiness", {
+			checkPin: PINS.ALCOHOL_READY,
+		});
+
 		rpio.open(PINS.ALCOHOL_READY, rpio.INPUT);
-		const isReady = rpio.read(PINS.ALCOHOL_READY) === rpio.HIGH;
+		const rawValue = rpio.read(PINS.ALCOHOL_READY);
+		const isReady = rawValue === rpio.HIGH;
+
+		console.debug("Alcohol readiness check result", {
+			pin: PINS.ALCOHOL_READY,
+			rawValue,
+			isReady,
+			interpretation: isReady ? "READY" : "NOT READY",
+		});
+
 		return isReady;
 	} catch (error) {
-		console.error("Error checking if alcohol sensor is ready:", error);
+		console.error("Alcohol readiness check failed", {
+			error: error.message,
+			pin: PINS.ALCOHOL_READY,
+			stack: error.stack,
+		});
 		return false;
 	}
 }
