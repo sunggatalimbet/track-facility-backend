@@ -1,22 +1,33 @@
 import rpio from "@remarkablearts/rpio";
 import { PINS } from "./constants.js";
 
-// Initialize GPIO with BCM numbering and proper setup
-rpio.init({ mapping: "gpio", mock: "raspi-3" });
+// Initialize GPIO with proper settings for Raspberry Pi 4
+rpio.init({
+	mapping: "gpio", // Use GPIO numbering
+	gpiomem: false, // Use /dev/mem for GPIO
+	mock: "raspi-4", // Specify Raspberry Pi 4
+});
 
 // Initialize all pins at startup
 function initializePins() {
 	try {
-		// Set up input pins
-		rpio.open(PINS.ALCOHOL_READY, rpio.INPUT, rpio.PULL_UP);
-		rpio.open(PINS.ALCOHOL_SOBER, rpio.INPUT, rpio.PULL_UP);
-		rpio.open(PINS.ALCOHOL_DRUNK, rpio.INPUT, rpio.PULL_UP);
-		rpio.open(PINS.ALCOHOL_POWER, rpio.INPUT, rpio.PULL_UP);
+		// Set up input pins with pull-up resistors
+		[
+			PINS.ALCOHOL_READY,
+			PINS.ALCOHOL_SOBER,
+			PINS.ALCOHOL_DRUNK,
+			PINS.ALCOHOL_POWER,
+		].forEach((pin) => {
+			rpio.open(pin, rpio.INPUT, rpio.PULL_UP);
+			console.log(`Pin ${pin} initialized as INPUT with PULL_UP`);
+		});
 
 		// Set up output pin
-		rpio.open(PINS.ALCOHOL_TOGGLE, rpio.OUTPUT, rpio.LOW);
+		rpio.open(PINS.ALCOHOL_TOGGLE, rpio.OUTPUT);
+		rpio.write(PINS.ALCOHOL_TOGGLE, rpio.LOW);
+		console.log(`Pin ${PINS.ALCOHOL_TOGGLE} initialized as OUTPUT`);
 
-		console.log("GPIO pins initialized successfully");
+		console.log("All GPIO pins initialized successfully");
 	} catch (error) {
 		console.error("Failed to initialize GPIO pins:", error);
 		throw error;
