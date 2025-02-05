@@ -1,11 +1,11 @@
 import rpio from "@remarkablearts/rpio";
 import { PINS } from "./constants.js";
 
-// Initialize GPIO with proper settings for Raspberry Pi 4
+// Initialize GPIO with safer settings
 rpio.init({
-	mapping: "gpio", // Use GPIO numbering
-	gpiomem: false, // Use /dev/mem for GPIO
-	mock: "raspi-4", // Specify Raspberry Pi 4
+	mapping: "gpio",
+	gpiomem: true, // Use /dev/gpiomem instead of /dev/mem
+	mock: "raspi-4",
 });
 
 // Initialize all pins at startup
