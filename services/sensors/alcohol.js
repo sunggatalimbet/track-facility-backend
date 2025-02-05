@@ -1,6 +1,7 @@
 import rpio from "@remarkablearts/rpio";
 import { PINS } from "./constants.js";
 
+// comments
 // Initialize GPIO with safer settings
 rpio.init({
 	mapping: "gpio",
