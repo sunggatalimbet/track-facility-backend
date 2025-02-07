@@ -1,16 +1,16 @@
 import { getTemperatureValue } from "../services/sensors/temperature.js";
-import {
-	getAlcoholValue,
-	toggleAlcoholSensor,
-	getAlcoholSensorStatus,
-	isAlcoholSensorReadyToUse,
-} from "../services/sensors/alcohol.js";
 // import {
+// 	getAlcoholValue,
+// 	toggleAlcoholSensor,
 // 	getAlcoholSensorStatus,
 // 	isAlcoholSensorReadyToUse,
-// 	toggleAlcoholSensor,
-// 	getAlcoholValue,
-// } from "../services/sensors/alcohol-bridge.js";
+// } from "../services/sensors/alcohol.js";
+import {
+	getAlcoholSensorStatus,
+	isAlcoholSensorReadyToUse,
+	toggleAlcoholSensor,
+	getAlcoholValue,
+} from "../services/sensors/alcohol-bridge.js";
 import { getPulseValue } from "../services/sensors/pulse.js";
 import { simulationService } from "../services/simulation.js";
 
