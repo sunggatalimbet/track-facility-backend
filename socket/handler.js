@@ -10,6 +10,7 @@ import {
 	isAlcoholSensorReadyToUse,
 	toggleAlcoholSensor,
 	getAlcoholValue,
+	currentState,
 } from "../services/sensors/alcohol-bridge.js";
 import { getPulseValue } from "../services/sensors/pulse.js";
 import { simulationService } from "../services/simulation.js";

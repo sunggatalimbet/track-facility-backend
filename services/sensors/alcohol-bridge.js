@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 
 const pythonProcess = spawn("python3", ["services/sensors/alcohol_gpio.py"]);
 
-let currentState = {
+export let currentState = {
 	ready: 0,
 	sober: 0,
 	drunk: 0,
@@ -48,8 +48,8 @@ export async function getAlcoholValue() {
 
 	return new Promise((resolve) => {
 		const checkState = () => {
-			if (currentState.sober === 0) resolve("normal");
-			if (currentState.drunk === 0) resolve("abnormal");
+			if (currentState.sober === 0) resolve("Трезвый");
+			if (currentState.drunk === 0) resolve("Пьяный");
 			if (Date.now() - start > timeout) resolve(null);
 			else setTimeout(checkState, 10);
 		};
