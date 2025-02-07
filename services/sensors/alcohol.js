@@ -2,42 +2,52 @@ import pkg from "node-libgpiod";
 import { PINS } from "./constants.js";
 
 const { Chip, Line } = pkg;
-// Typically gpiochip0 controls the main GPIO pins (header pins)
-const chip = new Chip(0);
 
-// Create line instances for all pins
-const lines = {
-	ALCOHOL_READY: new Line(chip, PINS.ALCOHOL_READY),
-	ALCOHOL_SOBER: new Line(chip, PINS.ALCOHOL_SOBER),
-	ALCOHOL_DRUNK: new Line(chip, PINS.ALCOHOL_DRUNK),
-	ALCOHOL_POWER: new Line(chip, PINS.ALCOHOL_POWER),
-	ALCOHOL_TOGGLE: new Line(chip, PINS.ALCOHOL_TOGGLE),
+// Store instances globally to prevent garbage collection
+global.chip = new Chip(0);
+global.lines = {
+	ALCOHOL_READY: new Line(global.chip, PINS.ALCOHOL_READY),
+	ALCOHOL_SOBER: new Line(global.chip, PINS.ALCOHOL_SOBER),
+	ALCOHOL_DRUNK: new Line(global.chip, PINS.ALCOHOL_DRUNK),
+	ALCOHOL_POWER: new Line(global.chip, PINS.ALCOHOL_POWER),
+	ALCOHOL_TOGGLE: new Line(global.chip, PINS.ALCOHOL_TOGGLE),
 };
 
 try {
+	// Configure input pins
 	[
-		lines.ALCOHOL_READY,
-		lines.ALCOHOL_SOBER,
-		lines.ALCOHOL_DRUNK,
-		lines.ALCOHOL_POWER,
+		global.lines.ALCOHOL_READY,
+		global.lines.ALCOHOL_SOBER,
+		global.lines.ALCOHOL_DRUNK,
+		global.lines.ALCOHOL_POWER,
 	].forEach((line) => {
 		line.requestInputMode({ bias: "pull-up" });
 	});
 
-	lines.ALCOHOL_TOGGLE.requestOutputMode();
+	// Configure output pin
+	global.lines.ALCOHOL_TOGGLE.requestOutputMode();
 	console.log("GPIO lines initialized successfully");
 } catch (error) {
 	console.error("Failed to initialize GPIO lines:", error);
 	process.exit(1);
 }
 
+// Cleanup handler
 process.on("exit", () => {
-	Object.values(lines).forEach((line) => line.release());
+	Object.values(global.lines).forEach((line) => {
+		try {
+			line.release();
+		} catch (error) {
+			console.error("Error releasing line:", error);
+		}
+	});
 });
 
+// Keep references in function scope
 export function getAlcoholSensorStatus() {
 	try {
-		return lines.ALCOHOL_POWER.getValue() === 0 ? "off" : "on";
+		const line = global.lines.ALCOHOL_POWER;
+		return line.getValue() === 0 ? "off" : "on";
 	} catch (error) {
 		console.error("Error reading alcohol sensor status:", error);
 		return "off";
@@ -51,14 +61,16 @@ export async function getAlcoholValue() {
 			return null;
 		}
 
-		let soberPrev = lines.ALCOHOL_SOBER.getValue();
-		let drunkPrev = lines.ALCOHOL_DRUNK.getValue();
+		const soberLine = global.lines.ALCOHOL_SOBER;
+		const drunkLine = global.lines.ALCOHOL_DRUNK;
+		let soberPrev = soberLine.getValue();
+		let drunkPrev = drunkLine.getValue();
 
-		const timeout = 10000;
+		const timeout = 5000;
 		const start = Date.now();
 		while (Date.now() - start < timeout) {
-			const soberCurrent = lines.ALCOHOL_SOBER.getValue();
-			const drunkCurrent = lines.ALCOHOL_DRUNK.getValue();
+			const soberCurrent = soberLine.getValue();
+			const drunkCurrent = drunkLine.getValue();
 
 			if (soberCurrent === 0 && soberPrev === 1) {
 				return "normal";
@@ -81,7 +93,8 @@ export async function getAlcoholValue() {
 
 export function isAlcoholSensorReadyToUse() {
 	try {
-		const ready = lines.ALCOHOL_READY.getValue();
+		const line = global.lines.ALCOHOL_READY;
+		const ready = line.getValue();
 		console.log("Alcohol sensor ready state:", ready);
 		return ready === 1;
 	} catch (error) {
@@ -92,8 +105,9 @@ export function isAlcoholSensorReadyToUse() {
 
 export function toggleAlcoholSensor() {
 	try {
-		lines.ALCOHOL_TOGGLE.setValue(1);
-		setTimeout(() => lines.ALCOHOL_TOGGLE.setValue(0), 500);
+		const line = global.lines.ALCOHOL_TOGGLE;
+		line.setValue(1);
+		setTimeout(() => line.setValue(0), 500);
 		return true;
 	} catch (error) {
 		console.error("Error toggling sensor:", error);
