@@ -5,6 +5,12 @@ import {
 	getAlcoholSensorStatus,
 	isAlcoholSensorReadyToUse,
 } from "../services/sensors/alcohol.js";
+// import {
+// 	getAlcoholSensorStatus,
+// 	isAlcoholSensorReadyToUse,
+// 	toggleAlcoholSensor,
+// 	getAlcoholValue,
+// } from "../services/sensors/alcohol-bridge.js";
 import { getPulseValue } from "../services/sensors/pulse.js";
 import { simulationService } from "../services/simulation.js";
 

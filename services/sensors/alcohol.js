@@ -100,23 +100,3 @@ export function toggleAlcoholSensor() {
 		return false;
 	}
 }
-
-// Add simulation support for non-RPi environments
-if (!isRaspberryPi()) {
-	console.warn("Running in simulation mode");
-	setInterval(() => {
-		lines.ALCOHOL_READY.setValue(Math.random() > 0.5 ? 1 : 0);
-		lines.ALCOHOL_SOBER.setValue(Math.random() > 0.5 ? 1 : 0);
-		lines.ALCOHOL_DRUNK.setValue(Math.random() > 0.5 ? 1 : 0);
-		lines.ALCOHOL_POWER.setValue(Math.random() > 0.5 ? 1 : 0);
-	}, 1000);
-}
-
-function isRaspberryPi() {
-	try {
-		const cpuInfo = require("fs").readFileSync("/proc/cpuinfo", "utf8");
-		return cpuInfo.includes("Raspberry Pi");
-	} catch {
-		return false;
-	}
-}
