@@ -64,6 +64,10 @@ export class SocketHandler {
 						const sensorReady = isAlcoholSensorReadyToUse();
 
 						if (sensorStatus === "off" || !sensorReady) {
+							console.log("Toggling sensor due to status:", {
+								sensorStatus,
+								sensorReady,
+							});
 							toggleAlcoholSensor();
 						}
 
@@ -74,6 +78,12 @@ export class SocketHandler {
 							alcoholLevel: alcoholLevel,
 							sensorStatus: sensorStatus,
 							sensorReady: sensorReady,
+							pinStates: {
+								ready: currentState.ready,
+								sober: currentState.sober,
+								drunk: currentState.drunk,
+								power: currentState.power,
+							},
 						});
 					} catch (error) {
 						console.error("Alcohol sensor error:", error);

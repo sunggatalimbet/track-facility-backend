@@ -28,19 +28,30 @@ def setup_gpio():
 
 def read_sensors():
     try:
-        return {
+        states = {
             'ready': GPIO.input(PINS['ALCOHOL_READY']),
             'sober': GPIO.input(PINS['ALCOHOL_SOBER']),
             'drunk': GPIO.input(PINS['ALCOHOL_DRUNK']),
             'power': GPIO.input(PINS['ALCOHOL_POWER'])
         }
+        
+        # Detailed pin status logging
+        print("=== Pin Status Details ===", file=sys.stderr)
+        for pin_name, state in states.items():
+            value = "HIGH (1)" if state else "LOW (0)"
+            print(f"Pin {PINS[pin_name]} ({pin_name}): {value}", file=sys.stderr)
+        print("=======================", file=sys.stderr)
+        
+        return states
     except Exception as e:
         print(json.dumps({'error': str(e)}))
         
 def toggle_sensor():
     try:
+        print("Toggle: Setting HIGH", file=sys.stderr)
         GPIO.output(PINS['ALCOHOL_TOGGLE'], GPIO.HIGH)
         time.sleep(0.5)
+        print("Toggle: Setting LOW", file=sys.stderr)
         GPIO.output(PINS['ALCOHOL_TOGGLE'], GPIO.LOW)
         return True
     except Exception as e:
